@@ -12,12 +12,12 @@
   let visible_years = ['aerial-1940']
   let year_layers = []
 
-  const avail_years = [1940, 1957, 1964, 1966, 1969, 1988]
+  const avail_years = [1940, 1956, 1957, 1964, 1966, 1969, 1988]
   // Tile extent: 465791.5084,499545.2019,4962112.6447,4990268.9920 [EPSG:26915]
   avail_years.forEach(year => {
     let credit = "Adapted from Hennepin County GIS"
-    if (year == 1966) {
-      credit = "Adapted from Hennepin County GIS"
+    if (year == 1956 || year == 1966) {
+      credit = "Adapted from USpatial"
     }
     year_layers.push({
       'year': year,
