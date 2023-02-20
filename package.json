@@ -10,6 +10,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch"
 	},
 	"devDependencies": {
+		"@originjs/vite-plugin-commonjs": "^1.0.3",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/adapter-static": "^2.0.1",
 		"@sveltejs/kit": "^1.5.0",
@@ -21,6 +22,7 @@
 	"type": "module",
 	"dependencies": {
 		"@mapbox/mapbox-gl-geocoder": "^5.0.1",
-		"mapbox-gl": "^2.12.1"
+		"mapbox-gl": "^2.12.1",
+		"mapbox-gl-compare": "^0.4.1"
 	}
 }
