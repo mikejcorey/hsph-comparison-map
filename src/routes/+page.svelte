@@ -36,7 +36,35 @@
       'source_id': 'u-properties',
       'credit': 'University of Minnesota Real Estate Office',
       'geojson_path': 'https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/overlays/u_realestate_tracts.geojson',
-      'visible': false
+      'visible': false,
+      'popup_attrs': [
+        'OBJECTID',
+        'TRACT_NUM',
+        'TRACT_NAME',
+        'COUNTY_PID',
+        'PRIMARY_ADDRESS',
+        'CITY',
+        'COUNTY',
+        'STATE',
+        'ZIP',
+        'PIN',
+        'LEGAL_DESCRIPTION',
+        'REPORTING_CAMPUS',
+        'TENURE',
+        'LAND_CLASS',
+        'ACQUISITION_DATE',
+        'ACQUISITION_COST',
+        'PREVIOUS_OWNER',
+        'ACQUISITION_TYPE',
+        'DEED_TYPE',
+        'ABSTRACT_DOC',
+        'ABSTRACT_BOOK_TYPE_PAGE',
+        'ABSTRACT_RECORDING_DATE',
+        'TORRENS_DOC',
+        'TORRENS_CERTIFICATE',
+        'TORRENS_BOOK_TYPE_PAGE',
+        'TORRENS_RECORDING_DATE',
+      ]
     }
   ]
 
@@ -111,47 +139,28 @@
       },
     });
 
-    map.on('click', layer_config.source_id, (e) => {
+    if (layer_config['popup_attrs']) {
+      map.on('click', layer_config.source_id, (e) => {
 
-      var html = '';
+        var html = popup_overlay_attr_mapper(e.features[0].properties, layer_config['popup_attrs'])
 
-      [
-        'OBJECTID',
-        'TRACT_NUM',
-        'TRACT_NAME',
-        'COUNTY_PID',
-        'PRIMARY_ADDRESS',
-        'CITY',
-        'COUNTY',
-        'STATE',
-        'ZIP',
-        'PIN',
-        'LEGAL_DESCRIPTION',
-        'REPORTING_CAMPUS',
-        'TENURE',
-        'LAND_CLASS',
-        'ACQUISITION_DATE',
-        'ACQUISITION_COST',
-        'PREVIOUS_OWNER',
-        'ACQUISITION_TYPE',
-        'DEED_TYPE',
-        'ABSTRACT_DOC',
-        'ABSTRACT_BOOK_TYPE_PAGE',
-        'ABSTRACT_RECORDING_DATE',
-        'TORRENS_DOC',
-        'TORRENS_CERTIFICATE',
-        'TORRENS_BOOK_TYPE_PAGE',
-        'TORRENS_RECORDING_DATE',
-      ].forEach((key) => {
-          html += `${key}: ${e.features[0].properties[key]}<br/>`
-        });
-
-      new mapboxgl.Popup({maxWidth: '350px'})
-        .setLngLat(e.lngLat)
-        .setHTML(html)
-        .addTo(map);
-    });
+        new mapboxgl.Popup({maxWidth: '350px'})
+          .setLngLat(e.lngLat)
+          .setHTML(html)
+          .addTo(map);
+      });
+    }
   };
+
+  const popup_overlay_attr_mapper = function (properties, attr_list) {
+    var html = '';
+
+    attr_list.forEach((key) => {
+      html += `${key}: ${properties[key]}<br/>`
+    })
+
+    return html
+  }
 
   const yearToggle = function (which_map) {
 
