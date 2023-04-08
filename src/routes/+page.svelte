@@ -29,6 +29,13 @@
 
   let year_layers = []
 
+  const poi_template = (props) => {
+    var template = ''
+    template += `<strong>${props.short_title}</strong>`;
+    template += `<div>${props.address}</div>`;
+    return template
+  }
+
   let overlay_layers = [
     {
       // 'year': year,
@@ -37,25 +44,26 @@
       'credit': 'University of Minnesota Real Estate Office',
       'geojson_path': 'https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/overlays/u_realestate_tracts.geojson',
       'visible': false,
+      'layer_type': 'fill',
+      'paint': {
+        'fill-color': '#0080ff', // blue color fill
+        'fill-opacity': 0.5
+      },
       'popup_attrs': [
-        'OBJECTID',
+        'PRIMARY_ADDRESS',
+        'ACQUISITION_TYPE',
+        'ACQUISITION_DATE',
+        'ACQUISITION_COST',
+        'PREVIOUS_OWNER',
         'TRACT_NUM',
         'TRACT_NAME',
         'COUNTY_PID',
-        'PRIMARY_ADDRESS',
-        'CITY',
         'COUNTY',
-        'STATE',
-        'ZIP',
         'PIN',
         'LEGAL_DESCRIPTION',
         'REPORTING_CAMPUS',
         'TENURE',
         'LAND_CLASS',
-        'ACQUISITION_DATE',
-        'ACQUISITION_COST',
-        'PREVIOUS_OWNER',
-        'ACQUISITION_TYPE',
         'DEED_TYPE',
         'ABSTRACT_DOC',
         'ABSTRACT_BOOK_TYPE_PAGE',
@@ -65,23 +73,108 @@
         'TORRENS_BOOK_TYPE_PAGE',
         'TORRENS_RECORDING_DATE',
       ]
+    }, {
+      'display_name': 'Class POIs',
+      'source_id': 'pois',
+      'credit': 'Various sources, class research',
+      'geojson_path': 'https://raw.githubusercontent.com/mikejcorey/cedar_riverside_points_layer/main/exports/cr-points.geojson',
+      'visible': false,
+      'layer_type': 'circle',
+      'paint': {
+        'circle-radius': 5,
+        'circle-color': 'blue',
+        'circle-stroke-color': 'white',
+        'circle-stroke-width': 1,
+        'circle-opacity': 0.5
+      },
+      'popup_template': (props) => {
+        console.log(props)
+        var template = ''
+        template += `<strong>${props.short_title}</strong>`;
+        template += `<div>${props.address}${props.intersection}</div>`;
+
+        if (props['web_img_final'] != '') {
+          template += `<a href="${props.web_img_final}" target="_blank"><img src="${props.web_img_final}" width="250"/></a>`;
+        }
+
+        template += `<p>${props.description}</p>`;
+
+        if (props['web_source_link'] != '') {
+            template += `<div><a href="${props.web_source_link}" target="_blank">Web source</a></div>`;
+        }
+
+        if (props['article_pdf'] != '') {
+            template += `<div><a href="${props.article_pdf}" target="_blank">Article PDF</a></div>`;
+        }
+
+        if (props['collection'] != '') {
+          template += `<div>Collection: ${props.collection}</div>`;
+        }
+        if (props['box'] != '') {
+          template += `<div>Collection: ${props.collection}</div>`;
+        }
+        if (props['folder'] != '') {
+          template += `<div>Collection: ${props.collection}</div>`;
+        }
+
+        return template
+      }
+    //   'popup_attrs': [
+    //     'short_title',
+    //     'description',
+    //     'address',
+    //     'city',
+    //     'intersection',
+    //     'image_url',
+    //     'article_pdf',
+    //     'web_source_link',
+    //     'collection',
+    //     'box',
+    //     'folder',
+    //   ]
     }
   ]
 
-  const avail_years = [1940, 1956, 1957, 1964, 1966, 1969, 1988]
+  const avail_tiles = [
+    {'year': '1917', 'type': 'seven_corners_nationalities', 'minzoom': 10, 'maxzoom': 20},
+    {'year': '1940', 'type': 'aerial', 'minzoom': 10, 'maxzoom': 17},
+    {'year': '1950', 'type': 'sanborn', 'minzoom': 10, 'maxzoom': 20},
+    {'year': '1956', 'type': 'aerial', 'minzoom': 10, 'maxzoom': 17},
+    {'year': '1957', 'type': 'aerial', 'minzoom': 10, 'maxzoom': 17},
+    {'year': '1964', 'type': 'aerial', 'minzoom': 10, 'maxzoom': 17},
+    {'year': '1966', 'type': 'aerial', 'minzoom': 10, 'maxzoom': 17},
+    {'year': '1969', 'type': 'aerial', 'minzoom': 10, 'maxzoom': 17},
+    {'year': '1988', 'type': 'aerial', 'minzoom': 10, 'maxzoom': 17}
+  ]
   // Tile extent: 465791.5084,499545.2019,4962112.6447,4990268.9920 [EPSG:26915]
-  avail_years.forEach(year => {
+  avail_tiles.forEach(year => {
     let credit = "Adapted from Hennepin County GIS"
-    if (year == 1956 || year == 1966) {
+    if (year.year == 1956 || year.year == 1966) {
       credit = "Adapted from USpatial"
+    } else if (year.type == 'sanborn') {
+      credit = "Sanborn map (credit needed)"
+    } else if (year.type == 'seven_corners_nationalities') {
+      credit = "Hennepin County Library"
     }
+
+    var tile_folder = year.year;
+    var tile_display_name = year.year;
+    if (year.type == 'sanborn') {
+      tile_folder = `${year.type}_${year.year}`
+      tile_display_name = `${year.year} Sanborn map`
+    }
+    if (year.type == 'seven_corners_nationalities') {
+      tile_folder = 'seven_corners_nationalities'
+      tile_display_name = `${year.year} Seven Corners District Nationalities`
+    }
+
     year_layers.push({
-      'year': year,
-      'source_id': `aerial-${year}`,
+      'year': tile_display_name,
+      'source_id': `${year.type}-${year.year}`,
       'credit': credit,
-      'tile_path': `https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/tiles/${year}/{z}/{x}/{y}.png`,
-      'minzoom': 10,
-      'maxzoom': 17
+      'tile_path': `https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/tiles/${tile_folder}/{z}/{x}/{y}.png`,
+      'minzoom': year.minzoom,
+      'maxzoom': year.maxzoom
     })
   });
 
@@ -127,22 +220,27 @@
 
     map.addLayer({
       'id': layer_config.source_id,
-      'type': 'fill',
+      'type': layer_config.layer_type,
       'source': `${layer_config.source_id}-geojson`,
-      'paint': {
-        'fill-color': '#0080ff', // blue color fill
-        'fill-opacity': 0.5
-      },
+      'paint': layer_config.paint,
       'layout': {
         // Make the layer not visible by default.
         'visibility': visibility,
       },
     });
 
-    if (layer_config['popup_attrs']) {
+    if ('popup_attrs' in layer_config || 'popup_template' in layer_config) {
       map.on('click', layer_config.source_id, (e) => {
 
-        var html = popup_overlay_attr_mapper(e.features[0].properties, layer_config['popup_attrs'])
+        var html = ''
+        console.log(layer_config)
+        if ('popup_template' in layer_config) {
+
+          html = layer_config['popup_template'](e.features[0].properties);
+
+        } else if ('popup_attrs' in layer_config) {
+          html = popup_overlay_attr_mapper(e.features[0].properties, layer_config['popup_attrs'])
+        }
 
         new mapboxgl.Popup({maxWidth: '350px'})
           .setLngLat(e.lngLat)

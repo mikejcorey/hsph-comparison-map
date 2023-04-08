@@ -1,3 +1,8 @@
+# uploading a new tileset/updating an old one
+```
+aws s3 sync . s3://hsph-urban-renewal/tiles/your_folder_here --acl public-read --storage-class STANDARD_IA
+```
+
 # create-svelte
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
