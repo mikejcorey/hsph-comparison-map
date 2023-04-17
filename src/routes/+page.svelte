@@ -74,6 +74,21 @@
         'TORRENS_RECORDING_DATE',
       ]
     }, {
+      // 'year': year,
+      'display_name': 'Clery bounds (approx.)',
+      'source_id': 'clery-boundary',
+      'credit': 'University of Minnesota',
+      'geojson_path': 'https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/overlays/clery_boundary.geojson',
+      'visible': false,
+      'layer_type': 'fill',
+      'paint': {
+        'fill-color': '#e15989', // pink color fill
+        'fill-opacity': 0.5
+      },
+      'popup_attrs': [
+        'name'
+      ]
+    }, {
       'display_name': 'Class POIs',
       'source_id': 'pois',
       'credit': 'Various sources, class research',
