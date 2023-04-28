@@ -38,58 +38,38 @@
 
   let overlay_layers = [
     {
-      // 'year': year,
-      'display_name': 'U-owned properties',
-      'source_id': 'u-properties',
-      'credit': 'University of Minnesota Real Estate Office',
-      'geojson_path': 'https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/overlays/u_realestate_tracts.geojson',
+      'display_name': 'Dakhóta place names',
+      'source_id': 'dakhota-places',
+      'credit': 'Various sources, class research',
+      'geojson_path': 'https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/overlays/dakhota_place_names.geojson',
       'visible': false,
-      'layer_type': 'fill',
+      'layer_type': 'circle',
       'paint': {
-        'fill-color': '#0080ff', // blue color fill
-        'fill-opacity': 0.5
+        'circle-radius': 5,
+        'circle-color': 'green',
+        'circle-stroke-color': 'white',
+        'circle-stroke-width': 1,
+        'circle-opacity': 0.5
       },
-      'popup_attrs': [
-        'PRIMARY_ADDRESS',
-        'ACQUISITION_TYPE',
-        'ACQUISITION_DATE',
-        'ACQUISITION_COST',
-        'PREVIOUS_OWNER',
-        'TRACT_NUM',
-        'TRACT_NAME',
-        'COUNTY_PID',
-        'COUNTY',
-        'PIN',
-        'LEGAL_DESCRIPTION',
-        'REPORTING_CAMPUS',
-        'TENURE',
-        'LAND_CLASS',
-        'DEED_TYPE',
-        'ABSTRACT_DOC',
-        'ABSTRACT_BOOK_TYPE_PAGE',
-        'ABSTRACT_RECORDING_DATE',
-        'TORRENS_DOC',
-        'TORRENS_CERTIFICATE',
-        'TORRENS_BOOK_TYPE_PAGE',
-        'TORRENS_RECORDING_DATE',
-      ]
+      'popup_template': (props) => {
+        console.log(props)
+        var template = ''
+        template += `<strong>${props.Name}</strong>`;
+
+        template += `<p>${props.Descriptio}</p>`;
+
+        if (props['ColonialAf'] != '' && props['ColonialAf'] != ' ') {
+          template += `<div>Colonial affiliation: ${props.ColonialAf}</div>`;
+        }
+
+        if (props['Interpreta'] != '' && props['Interpreta'] != ' ') {
+          template += `<div>Interpreter: ${props.Interpreta}</div>`;
+        }
+
+        return template
+      }
     }, {
-      // 'year': year,
-      'display_name': 'Clery bounds (approx.)',
-      'source_id': 'clery-boundary',
-      'credit': 'University of Minnesota',
-      'geojson_path': 'https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/overlays/clery_boundary.geojson',
-      'visible': false,
-      'layer_type': 'fill',
-      'paint': {
-        'fill-color': '#e15989', // pink color fill
-        'fill-opacity': 0.5
-      },
-      'popup_attrs': [
-        'name'
-      ]
-    }, {
-      'display_name': 'Class POIs',
+      'display_name': 'Photos/points of interest',
       'source_id': 'pois',
       'credit': 'Various sources, class research',
       'geojson_path': 'https://raw.githubusercontent.com/mikejcorey/cedar_riverside_points_layer/main/exports/cr-points.geojson',
@@ -147,6 +127,57 @@
     //     'box',
     //     'folder',
     //   ]
+    }, {
+      // 'year': year,
+      'display_name': 'UMN-owned properties',
+      'source_id': 'u-properties',
+      'credit': 'University of Minnesota Real Estate Office',
+      'geojson_path': 'https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/overlays/u_realestate_tracts.geojson',
+      'visible': false,
+      'layer_type': 'fill',
+      'paint': {
+        'fill-color': '#0080ff', // blue color fill
+        'fill-opacity': 0.5
+      },
+      'popup_attrs': [
+        'PRIMARY_ADDRESS',
+        'ACQUISITION_TYPE',
+        'ACQUISITION_DATE',
+        'ACQUISITION_COST',
+        'PREVIOUS_OWNER',
+        'TRACT_NUM',
+        'TRACT_NAME',
+        'COUNTY_PID',
+        'COUNTY',
+        'PIN',
+        'LEGAL_DESCRIPTION',
+        'REPORTING_CAMPUS',
+        'TENURE',
+        'LAND_CLASS',
+        'DEED_TYPE',
+        'ABSTRACT_DOC',
+        'ABSTRACT_BOOK_TYPE_PAGE',
+        'ABSTRACT_RECORDING_DATE',
+        'TORRENS_DOC',
+        'TORRENS_CERTIFICATE',
+        'TORRENS_BOOK_TYPE_PAGE',
+        'TORRENS_RECORDING_DATE',
+      ]
+    }, {
+      // 'year': year,
+      'display_name': 'UMN jurisdiction (approximate)',
+      'source_id': 'clery-boundary',
+      'credit': 'University of Minnesota',
+      'geojson_path': 'https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/overlays/clery_boundary.geojson',
+      'visible': false,
+      'layer_type': 'fill',
+      'paint': {
+        'fill-color': '#e15989', // pink color fill
+        'fill-opacity': 0.5
+      },
+      'popup_attrs': [
+        'name'
+      ]
     }
   ]
 
@@ -446,11 +477,11 @@
 
 </style>
 
-<h1>HSPH comparison map</h1>
+<h1>Cedar-Riverside history map</h1>
 
 <div id="control-container">
   <div class="control-item">
-    <label>Left side</label>
+    <label for="layer-menu-left">Left side</label>
     <select id="layer-menu-left" bind:value={visible_year['left']} on:change="{() => yearToggle('left')}">
     	{#each year_layers as layer}
     		<option value={layer.source_id}>{layer.year}</option>
@@ -460,7 +491,7 @@
   </div>
 
   <div class="control-item">
-    <label>Right side</label>
+    <label for="layer-menu-right">Right side</label>
     <select id="layer-menu-right" bind:value={visible_year['right']} on:change="{() => yearToggle('right')}">
     	{#each year_layers as layer}
     		<option value={layer.source_id}>{layer.year}</option>
