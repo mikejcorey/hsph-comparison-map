@@ -6,10 +6,15 @@
   import "mapbox-gl/dist/mapbox-gl.css";
   import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
+  import layers_svg from '$lib/static/winfo-icon-layer-control.svg';
+
   // See dynamic import in OnMount
   // import MapboxCompare from "mapbox-gl-compare";
 
   import 'mapbox-gl-compare/dist/mapbox-gl-compare.css';
+
+  let innerWidth = 0
+  let innerHeight = 0
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoibWFwcGluZ3ByZWp1ZGljZSIsImEiOiJjbDJ6MW92eDIwMGdzM2NxenQ0MGk3b3BhIn0.JPNTwpmUJahPgt6LUlX9fg";
@@ -28,6 +33,8 @@
   let visible_overlays = []
 
   let year_layers = []
+
+  let layer_control_visible;
 
   const poi_template = (props) => {
     var template = ''
@@ -211,7 +218,7 @@
     }
     if (year.type == 'seven_corners_nationalities') {
       tile_folder = 'seven_corners_nationalities'
-      tile_display_name = `${year.year} Seven Corners District Nationalities`
+      tile_display_name = `${year.year} 7 Corners Nationalities`
     }
 
     year_layers.push({
@@ -223,6 +230,7 @@
       'maxzoom': year.maxzoom
     })
   });
+
 
   const addTileLayer = function (map, which_map, layer_config) {
     map.addSource(`${layer_config.source_id}-tiles`, {
@@ -322,6 +330,30 @@
     });
   };
 
+  const showLayerControl = function (e) {
+    var clickedButton = this.id;
+
+    this.style.display = 'none';
+
+    overlay_layers.forEach((layer) => {
+      document.getElementById(layer.source_id).style.display = 'block';
+    })
+    document.getElementById('hide-layers-button').style.display = 'block';
+
+  }
+
+  const hideLayerControl = function (e) {
+    var clickedButton = this.id;
+
+    this.style.display = 'none';
+
+    overlay_layers.forEach((layer) => {
+      document.getElementById(layer.source_id).style.display = 'none';
+    })
+
+    document.getElementById('show-layers-button').style.display = 'block';
+  }
+
   const overlayToggle = function (e) {
     // Generally based on https://docs.mapbox.com/mapbox-gl-js/example/toggle-layers/
     var clickedOverlay = this.id;
@@ -358,6 +390,8 @@
           mapboxgl: mapboxgl,
           collapsed: true
       }), 'top-right');
+      //
+      // map.addControl(new HelloWorldControl(), 'bottom-right');
     }
 
     map.addControl(new mapboxgl.NavigationControl(), 'top-left');
@@ -408,13 +442,34 @@
 
 </script>
 
-<style>
+<style lang="scss">
+
+  #page-header {
+    position: absolute;
+    display: inline-block;
+    font-size: 0.8em;
+    max-width: 70%;
+    margin: 0 auto;
+    padding: 0.4em;
+    /* width: 75%; */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+
+  #page-header h1 {
+    margin: 0 0 0.5em;
+  }
 
   #control-container {
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-around;
-    margin: 20px 0;
+    margin: 10px 0 5px 0;
+    z-index: 50;
   }
 
   .control-item {
@@ -462,6 +517,24 @@
     border-radius: 5px;
   }
 
+  #layer-menu button#show-layers-button,
+  #layer-menu button#hide-layers-button {
+    display: none;
+  }
+
+  @media screen and (max-width: 480px) {
+    #layer-menu button#show-layers-button {
+      display: block;
+      width: 40px;
+      height: 40px;
+    }
+
+    #layer-menu button.hsph-layer-toggle,
+    #layer-menu button#hide-layers-button {
+      display: none;
+    }
+  }
+
   #layer-menu button:hover {
     color: #000;
     cursor: pointer;
@@ -476,37 +549,45 @@
   }
 
 </style>
+<svelte:window bind:innerWidth bind:innerHeight />
 
-<h1>Cedar-Riverside history map</h1>
+<section id="page-header">
+  <h1>Cedar-Riverside history map</h1>
+  <p>For educational use only</p>
 
-<div id="control-container">
-  <div class="control-item">
-    <label for="layer-menu-left">Left side</label>
-    <select id="layer-menu-left" bind:value={visible_year['left']} on:change="{() => yearToggle('left')}">
-    	{#each year_layers as layer}
-    		<option value={layer.source_id}>{layer.year}</option>
-    	{/each}
-      <option value="2023">2023</option>
-    </select>
+  <!-- <div>{innerHeight}</div> -->
+
+  <div id="control-container">
+    <div class="control-item">
+      <label for="layer-menu-left">Left side</label>
+      <select id="layer-menu-left" bind:value={visible_year['left']} on:change="{() => yearToggle('left')}">
+      	{#each year_layers as layer}
+      		<option value={layer.source_id}>{layer.year}</option>
+      	{/each}
+        <option value="2023">2023</option>
+      </select>
+    </div>
+
+    <div class="control-item">
+      <label for="layer-menu-right">Right side</label>
+      <select id="layer-menu-right" bind:value={visible_year['right']} on:change="{() => yearToggle('right')}">
+      	{#each year_layers as layer}
+      		<option value={layer.source_id}>{layer.year}</option>
+      	{/each}
+        <option value="2023">2023</option>
+      </select>
+    </div>
   </div>
-
-  <div class="control-item">
-    <label for="layer-menu-right">Right side</label>
-    <select id="layer-menu-right" bind:value={visible_year['right']} on:change="{() => yearToggle('right')}">
-    	{#each year_layers as layer}
-    		<option value={layer.source_id}>{layer.year}</option>
-    	{/each}
-      <option value="2023">2023</option>
-    </select>
-  </div>
-</div>
+</section>
 
 <div id="comparison-container">
   <nav id="layer-menu">
+    <button id="show-layers-button" on:click={showLayerControl}><img src="{layers_svg}" alt="Map layers"/></button>
     {#each overlay_layers as layer}
-      <button id={layer.source_id} class:active="{visible_overlays.includes(layer.source_id)}" on:click={overlayToggle}>{layer.display_name}</button>
+      <button id={layer.source_id} class="hsph-layer-toggle" class:active="{visible_overlays.includes(layer.source_id)}" on:click={overlayToggle}>{layer.display_name}</button>
     {/each}
+    <button id="hide-layers-button" on:click={hideLayerControl}>Hide layer control</button>
   </nav>
-  <div id="map-canvas-left" class="map"></div>
-  <div id="map-canvas-right" class="map"></div>
+  <div id="map-canvas-left" class="map" style="height: {innerHeight}px"></div>
+  <div id="map-canvas-right" class="map" style="height: {innerHeight}px"></div>
 </div>
