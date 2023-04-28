@@ -27,7 +27,7 @@
 
   let visible_year = {
     left: 'aerial-1940',
-    right: '2023'
+    right: '2023 satellite'
   }
 
   let visible_overlays = []
@@ -214,11 +214,11 @@
     var tile_display_name = year.year;
     if (year.type == 'sanborn') {
       tile_folder = `${year.type}_${year.year}`
-      tile_display_name = `${year.year} Sanborn map`
+      tile_display_name = `${year.year} Sanborn`
     }
     if (year.type == 'seven_corners_nationalities') {
       tile_folder = 'seven_corners_nationalities'
-      tile_display_name = `${year.year} 7 Corners Nationalities`
+      tile_display_name = `${year.year} Seven Corners`
     }
 
     year_layers.push({
@@ -318,7 +318,12 @@
 
     var year_obj = year_layers.filter(year => year.source_id == visible_year[which_map])[0]
 
-    if (visible_year[which_map] != 2023) {
+    if (visible_year[which_map] == '2023 streets') {
+      map_sides[which_map].setStyle('mapbox://styles/mapbox/streets-v12');
+    } else if (visible_year[which_map] == '2023 satellite') {
+      map_sides[which_map].setStyle('mapbox://styles/mapbox/satellite-v9');
+    } else {
+    // if (visible_year[which_map] != 2023) {
       // Don't style, in order to avoid untidy console error
       map_sides[which_map].setLayoutProperty(visible_year[which_map], "visibility", "visible");
     }
@@ -380,8 +385,8 @@
     map = new mapboxgl.Map({
         container: `map-canvas-${which_map}`, // container ID
         style: 'mapbox://styles/mapbox/satellite-v9', // style URL
-        center: [-93.23, 44.9655], // starting position [lng, lat]
-        zoom: 14 // starting zoom
+        center: [-93.2409, 44.9677], // starting position [lng, lat]
+        zoom: 15 // starting zoom
     });
 
     if (which_map == "right") {
@@ -396,8 +401,7 @@
 
     map.addControl(new mapboxgl.NavigationControl(), 'top-left');
 
-    map.on('load', () => {
-
+    const loadMapLayers = function(map) {
       const layers = map.getStyle().layers;
       // Find the index of the first symbol layer in the map style.
       let firstSymbolId;
@@ -417,6 +421,21 @@
       overlay_layers.forEach(layer => {
         addGeoJSONLayer(map, which_map, layer)
       });
+
+      // show or re-show any visible layers that might have been wiped out
+      visible_overlays.forEach((layer) => {
+        map.setLayoutProperty(layer, "visibility", "visible");
+      });
+    }
+
+    map.on('style.load', () => {
+      loadMapLayers(map);
+    });
+
+    map.on('load', () => {
+
+      // disable map rotation using touch rotation gesture
+      map.touchZoomRotate.disableRotation();
 
     });
 
@@ -485,7 +504,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 700px;
+    /* height: 700px; */
   }
 
   .map {
@@ -564,7 +583,8 @@
       	{#each year_layers as layer}
       		<option value={layer.source_id}>{layer.year}</option>
       	{/each}
-        <option value="2023">2023</option>
+        <option value="2023 streets">2023 streets</option>
+        <option value="2023 satellite">2023 satellite</option>
       </select>
     </div>
 
@@ -574,13 +594,14 @@
       	{#each year_layers as layer}
       		<option value={layer.source_id}>{layer.year}</option>
       	{/each}
-        <option value="2023">2023</option>
+        <option value="2023 streets">2023 streets</option>
+        <option value="2023 satellite">2023 satellite</option>
       </select>
     </div>
   </div>
 </section>
 
-<div id="comparison-container">
+<div id="comparison-container" style="height: {innerHeight}px">
   <nav id="layer-menu">
     <button id="show-layers-button" on:click={showLayerControl}><img src="{layers_svg}" alt="Map layers"/></button>
     {#each overlay_layers as layer}
