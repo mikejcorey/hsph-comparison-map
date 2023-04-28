@@ -185,6 +185,21 @@
       'popup_attrs': [
         'name'
       ]
+    }, {
+      // 'year': year,
+      'display_name': 'Freeway outline',
+      'source_id': 'freeway-outline',
+      'credit': 'Michael Corey',
+      'geojson_path': 'https://hsph-urban-renewal.s3.us-east-2.amazonaws.com/overlays/freeway_outline.geojson',
+      'visible': false,
+      'layer_type': 'fill',
+      'paint': {
+        'fill-color': '#d80606', // red color fill
+        'fill-opacity': 0.4
+      },
+      'popup_attrs': [
+        'name'
+      ]
     }
   ]
 
@@ -475,7 +490,7 @@
     left: 0;
     right: 0;
     z-index: 100;
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.8);
   }
 
   #page-header h1 {
