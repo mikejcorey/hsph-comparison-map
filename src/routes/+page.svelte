@@ -52,11 +52,11 @@
       'visible': false,
       'layer_type': 'circle',
       'paint': {
-        'circle-radius': 5,
+        'circle-radius': 7,
         'circle-color': 'green',
         'circle-stroke-color': 'white',
         'circle-stroke-width': 1,
-        'circle-opacity': 0.5
+        'circle-opacity': 0.8
       },
       'popup_template': (props) => {
         console.log(props)
@@ -83,7 +83,7 @@
       'visible': false,
       'layer_type': 'circle',
       'paint': {
-        'circle-radius': 5,
+        'circle-radius': 7,
         'circle-color': 'blue',
         'circle-stroke-color': 'white',
         'circle-stroke-width': 1,
@@ -96,7 +96,8 @@
         template += `<div>${props.address}${props.intersection}</div>`;
 
         if (props['web_img_final'] != '') {
-          template += `<a href="${props.web_img_final}" target="_blank"><img src="${props.web_img_final}" width="250"/></a>`;
+          // template += `<a href="${props.web_img_final}" target="_blank"><img src="${props.web_img_final}" width="250"/></a>`;
+          template += `<a href="${props.web_img_final}" target="_blank"><iframe src="${props.web_img_final}" width="250"/></a>`;
         }
 
         template += `<p>${props.description}</p>`;
